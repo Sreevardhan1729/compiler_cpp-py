@@ -1,0 +1,13 @@
+{% if sub.status == 'OK' or sub.status == "AC" %}
+  <h2 class="text-green-600 font-bold">Output ({{ sub.exec_time_ms }} ms)</h2>
+  <pre class="p-4 bg-slate-800 text-lime-100 rounded">{{ output }}</pre>
+{% elif sub.status == 'TLE' %}
+  <div class="text-red-600 font-bold">⏰ Time-limit exceeded (4 s)</div>
+{% else %}
+  <h2 class="text-red-600 font-bold">{{ sub.status }}</h2>
+  <pre class="p-4 bg-slate-800 text-pink-200 rounded">{{ error }}</pre>
+{% endif %}
+
+<div class="mt-4">
+  <a href="{% url 'editor' %}" class="text-blue-600 underline">Run another code</a>
+</div>

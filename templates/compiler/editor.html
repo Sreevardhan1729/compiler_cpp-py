@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <link rel="stylesheet" href="{% static 'compiler/editor.css' %}">
+  </head>
+  <body class="p-6 bg-slate-100">
+    <h1 class="text-2xl font-semibold mb-4">Mini Compiler</h1>
+    <form hx-post="{% url 'submit' %}" hx-target="#result" hx-swap="innerHTML">
+      {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+      {% endfor %}
+      
+      <!-- If code is not rendered from hidden_fields, add it here manually -->
+      {% if not form.code %}
+      <input type="hidden" id="id_code" name="code">
+      {% endif %}
+      
+      {{ form.non_field_errors }}
+      <div class="mb-4">
+        <label for="id_language" class="block mb-1">Language</label>
+        {{ form.language }}
+        {% for error in form.language.errors %}
+          <div class="text-red-600">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div id="editor" style="height:300px;border:1px solid #ddd;"></div>
+
+      <div class="mt-4">
+        <label for="id_stdin" class="block mb-1">STDIN</label>
+        {{ form.stdin }}
+        {% for error in form.stdin.errors %}
+          <div class="text-red-600">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <button class="mt-4 bg-blue-600 text-white rounded px-4 py-2">Run</button>
+    </form>
+
+    <hr class="my-6">
+    <div id="result"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function(){
+          require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+          require(['vs/editor/editor.main'], function () {
+              const cppDefaultCode = `#include <bits/stdc++.h>\nint main(){\n\treturn 0;\n}`;
+              const pythonDefaultCode = `# Your Python code here\n`;
+              
+              const editor = monaco.editor.create(document.getElementById('editor'), {
+                  value: cppDefaultCode,
+                  language: 'cpp'
+              });
+
+              // Set initial value for the hidden input
+              document.getElementById('id_code').value = cppDefaultCode;
+
+              // Update the code field whenever the editor content changes
+              editor.onDidChangeModelContent(() => {
+                  document.getElementById('id_code').value = editor.getValue();
+              });
+
+              // Backup submit handler
+              document.querySelector('form').addEventListener('submit', e => {
+                  document.getElementById('id_code').value = editor.getValue();
+              });
+
+              document.getElementById('id_language').addEventListener('change', e => {
+                  const lang = e.target.value;
+                  if (lang === 'py') {
+                      editor.setValue(pythonDefaultCode);
+                      monaco.editor.setModelLanguage(editor.getModel(), 'py');
+                  } else {
+                      editor.setValue(cppDefaultCode);
+                      monaco.editor.setModelLanguage(editor.getModel(), 'cpp');
+                  }
+              });
+          });
+      });
+    </script>
+  </body>
+</html>
