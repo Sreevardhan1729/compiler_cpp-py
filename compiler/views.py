@@ -42,7 +42,6 @@ def submit(request):
     )
     run_submissions(str(sub.id))
     response = redirect("result", pk=sub.id)
-    response["HX-Redirect"] = response.url
     return response
 
 def result(request,pk):
