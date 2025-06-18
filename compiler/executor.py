@@ -7,7 +7,6 @@ MEM_LIMIT = 256 *1024 * 1024
 
 def set_limits():
     if platform.system() == "Darwin":
-        # On macOS, avoid setting RLIMIT_AS which may cause an exception.
         resource.setrlimit(resource.RLIMIT_CPU, (TIME_LIMIT, TIME_LIMIT))
     else:
         resource.setrlimit(resource.RLIMIT_AS, (MEM_LIMIT, MEM_LIMIT))
@@ -35,7 +34,7 @@ def run_submissions(sub_id: str):
             )
             if compiler.returncode != 0:
                 error_path.write_bytes(compiler.stderr)
-                sub.status = "CE"
+                sub.status = "Compilation Error"
                 sub.error_path = str(error_path)
                 sub.completed_at = datetime.datetime.now(datetime.timezone.utc)
                 sub.save()
@@ -56,12 +55,12 @@ def run_submissions(sub_id: str):
                 proc.wait(TIME_LIMIT + 1)
             except subprocess.TimeoutExpired:
                 proc.kill()
-                sub.status = "TLE"
+                sub.status = "Time Limit Exceeded"
             else:
                 if proc.returncode ==0:
-                    sub.status="AC"
+                    sub.status="Accepted"
                 else:
-                    sub.status = "RE"
+                    sub.status = "Runtime Error"
         sub.output_path = str(output_path)
         sub.error_path = str(error_path)
     except Exception as e:

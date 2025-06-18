@@ -9,6 +9,7 @@
   <body class="p-6 bg-slate-100">
     <h1 class="text-2xl font-semibold mb-4">Mini Compiler</h1>
     <form hx-post="{% url 'submit' %}" hx-target="#result" hx-swap="innerHTML">
+      {% csrf_token %}
       {% for hidden in form.hidden_fields %}
           {{ hidden }}
       {% endfor %}
@@ -47,8 +48,8 @@
       document.addEventListener("DOMContentLoaded", function(){
           require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
           require(['vs/editor/editor.main'], function () {
-              const cppDefaultCode = `#include <bits/stdc++.h>\nint main(){\n\treturn 0;\n}`;
-              const pythonDefaultCode = `# Your Python code here\n`;
+              const cppDefaultCode = `#include <iostream>\nusing namespace std;\nint main(){\n\tcout<<"Task";\n\treturn 0;\n}`;
+              const pythonDefaultCode = `# Your Python code here\nprint("Task")`;
               
               const editor = monaco.editor.create(document.getElementById('editor'), {
                   value: cppDefaultCode,

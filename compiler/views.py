@@ -13,7 +13,7 @@ def editor(request):
     return render(request,"compiler/editor.html",{"form":SubmissionForm()})
 
 
-@csrf_exempt
+# @csrf_exempt
 def submit(request):
     if request.method != "POST":
         return redirect("editor")

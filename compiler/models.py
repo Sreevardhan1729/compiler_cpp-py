@@ -11,7 +11,7 @@ class CodeSubmission(models.Model):
     input_path = models.TextField()
     output_path = models.TextField(null=True,blank=True)
     error_path = models.TextField(null=True,blank=True)
-    created_at = models.DateTimeField(auto_now=True)
+
     completed_at = models.DateTimeField(null=True,blank=True)
     status = models.CharField(max_length=32,default="QUEUED")
     exec_time_ms = models.IntegerField(null=True,blank=True)
