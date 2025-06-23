@@ -39,22 +39,23 @@ def run_submissions(sub_id: str):
                 sub.completed_at = datetime.datetime.now(datetime.timezone.utc)
                 sub.save()
                 return sub
-            run_cmd = f"timeout {TIME_LIMIT}s {exe_path}"
+            run_cmd = f"{exe_path}"
         elif sub.language == "py":
-            run_cmd = f"timeout {TIME_LIMIT}s python3 {code_path}"
+            run_cmd = f"python3 {code_path}"
         
         with open(input_path,"rb") as fin, \
                 open(output_path,"wb") as fout,\
                 open(error_path,"wb") as ferr:
-            proc = subprocess.Popen(
-                shlex.split(run_cmd),
-                stdin=fin,stdout=fout,stderr=ferr,
-                preexec_fn=set_limits,
-            )
+            
             try:
-                proc.wait(TIME_LIMIT + 1)
+                proc = subprocess.run(
+                    run_cmd,
+                    stdin=fin, stdout=fout, stderr=ferr,
+                    timeout=TIME_LIMIT,
+                    preexec_fn=set_limits,
+                )
             except subprocess.TimeoutExpired:
-                proc.kill()
+
                 sub.status = "Time Limit Exceeded"
             else:
                 if proc.returncode ==0:
